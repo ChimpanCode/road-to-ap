@@ -1,54 +1,32 @@
-# React + TypeScript + Vite
+# Road to AP (応用情報技術者試験)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+このプロジェクトは、応用情報技術者試験の準備をサポートするためのアプリケーション（開発中）です。試験日までの残り日数を表示したり、クイズ形式で知識を確認する機能を提供します。
 
-Currently, two official plugins are available:
+## 主な機能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **残り日数の表示**  
+  `DaysLeft` コンポーネントを使用して、試験日までの残り日数をリアルタイムで表示します。
 
-## Expanding the ESLint configuration
+- **クイズ機能**  
+  `Gemini` コンポーネントを使用して、ランダムな問題を生成し、解答を確認できます。
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 使用技術
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **フロントエンド**: React, TypeScript
+- **スタイリング**: Tailwind CSS, Material-UI
+- **ユーティリティ**: date-fns
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## セットアップ
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 必要条件
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- Node.js (推奨バージョン: 16.x 以上)
+- npm または yarn
+
+### インストール手順
+
+1. リポジトリをクローンします。
+   ```bash
+   git clone https://github.com/your-repo/road-to-ap.git
+   cd road-to-ap
+   ```
