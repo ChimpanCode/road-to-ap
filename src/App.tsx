@@ -7,6 +7,9 @@ import React from 'react'
 
 // 外部関数のインポート
 import Home from './components/Home';
+import Navbar from './components/Navbar';
+import Gemini from './components/Gemini';
+import VoiceInput from './components/VoiceInput';
 
 
 function App() {
@@ -19,9 +22,19 @@ function App() {
   // 正解判定用のuseState
 
   return (
-    <>
-      <Home></Home>
-    </>
+    <Router>
+      <div>
+        {/* ナビゲーションメニュー */}
+        <Navbar></Navbar>
+
+        {/* ルーティング設定 */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/quiz" element={<Gemini />} />
+          <Route path="/voice" element={<VoiceInput />} />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 

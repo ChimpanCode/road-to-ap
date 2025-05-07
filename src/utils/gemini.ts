@@ -27,7 +27,7 @@ const startGemini = async (prompt: string): Promise<string> => {
   return text;
 };
 
-// Gemini APIを停止する関数？
+// Geminiモデルを使用して音声認識を行うための関数
 
 // エクスポートをまとめて行う
 export { startGemini };

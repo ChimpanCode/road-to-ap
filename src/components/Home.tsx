@@ -5,15 +5,15 @@ import { useState } from 'react';
 
 import DaysLeft from './DaysLeft';
 import Gemini from './Gemini';
+import VoiceInput from './VoiceInput';
 
 
 const Home = () => {
   
   return (
     <>
+    <h1>デモ</h1>
       <DaysLeft></DaysLeft>
-      <Gemini></Gemini>
-      
     </>
   );
 };
