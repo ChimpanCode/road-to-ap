@@ -1,0 +1,37 @@
+nav {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 50px;
+    background-color: rgb(128, 175, 122);
+    gap: 45px;
+    
+    padding-right: 24px; /* 右端に少し隙間を追加 */
+}
+
+.app-title {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-right: 40px;
+    padding-left: 24px; /* 左端に少し隙間を追加 */
+}
+
+.nav-links {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    gap: 45px;
+}
+
+nav a{
+    text-decoration: none;
+    color: white;
+}
+
+nav a:hover {
+    color: cadetblue;
+}
+
+nav a svg{
+    margin-right: 5px;
+}
