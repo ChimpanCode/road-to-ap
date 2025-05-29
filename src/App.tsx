@@ -6,7 +6,7 @@ import './App.css'
 
 
 // 外部関数のインポート
-import Home from './components/Home';
+import Home from './components/home_mode/Home';
 import Navbar from './components/Navbar';
 import Verbalization from './components/verbalization_mode/Verbalization';
 import Login from './components/Login';
