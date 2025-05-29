@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 // 外部関数のインポート
 import { generateQuizWithGemini, checkAnswerWithGemini } from '../../utils/gemini';
 import { pickRandomWord } from '../../utils/common';
@@ -14,12 +14,13 @@ type Props = {
   endQuiz: () => void;
 };
 
-const Gemini = ({ answerWordList, endQuiz }: Props) => {
+const QuizGenerator = ({ answerWordList, endQuiz }: Props) => {
   const [questionText, setQuestionText] = useState('');
   const [answerWord, setAnswerWord] = useState(''); // クイズの解答となる用語
   const [isAnswerVisible, setIsAnswerVisible] = useState(false); // 解答表示用のuseState
   const [isLoading, setIsLoading] = useState(false); // クイズ生成中のローディング状態を管理するuseState
   const [userAnswer, setUserAnswer] = useState(""); // ユーザーの回答
+  const inputRef = useRef<HTMLInputElement>(null); // 入力フィールドの参照
 
   // Gemini APIを呼び出してクイズを一問生成しステートに保存する関数
   const generateQuiz = async () => {
@@ -67,7 +68,14 @@ const Gemini = ({ answerWordList, endQuiz }: Props) => {
     if (answerWordList.length > 0) {
       generateQuiz();
     }
-  }, [answerWordList]);
+  }, []);
+
+  // フォーカス制御
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [questionText, isLoading]); // 問題が変わるたびにフォーカス
 
   return (
     <main className="w-full h-screen flex flex-col justify-center items-center bg-sky-100">
@@ -103,14 +111,36 @@ const Gemini = ({ answerWordList, endQuiz }: Props) => {
           value={userAnswer}
           onChange={(e) => setUserAnswer(e.target.value)}
           disabled={isLoading}
+          size="medium"
+          style={{ minWidth: 240 }}
+          inputRef={inputRef} // 入力フィールドの参照を設定
+          onKeyDown={(e) => {
+            if (
+              e.key === "Enter" &&
+              !isLoading &&
+              userAnswer.trim() !== ""
+            ) {
+              checkAnswer();
+            }
+          }}
         />
         {/* 送信ボタン */}
         <IconButton
           color="primary"
           onClick={checkAnswer}
           disabled={isLoading || !userAnswer}
+          style={{
+            height: 40,
+            width: 40,
+            marginLeft: 4,
+            marginTop: 7,
+            border: "1px solid #1976d2",
+            background: "#f5faff",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
         >
-          <SendIcon />
+          <SendIcon style={{ fontSize: 28, verticalAlign: "middle" }} />
         </IconButton>
       </div>
 
@@ -139,4 +169,4 @@ const Gemini = ({ answerWordList, endQuiz }: Props) => {
   );
 };
 
-export default Gemini;
+export default QuizGenerator;

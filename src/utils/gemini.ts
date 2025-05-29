@@ -16,7 +16,7 @@ const generateQuizWithGemini = async (answerWord: string): Promise<string> => {
   // クイズ用に出力を修正するための指示文をモデルに渡しておく
   const prompt = `${answerWord}を解答とするようなクイズの問題文を一問生成してください。\n
     問題文以外は出力しないでください。\n
-    ${answerWord}を使用した問題ではなく、${answerWord}自体が解答となるような問題にしてください。\n`;
+    ${answerWord}を使用した問題ではなく、必ず${answerWord}という用語名自体が解答となるような問題にしてください。\n`;
 
   // プロンプトに基づいてテキストを生成
   const result = await model.generateContent(prompt);
