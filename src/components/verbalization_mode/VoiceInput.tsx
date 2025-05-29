@@ -1,41 +1,37 @@
 import { useState, useRef, useEffect } from 'react';
 // 外部関数のインポート
-import { startGeminiVoice } from '../../utils/gemini';
+import { transcribeAudioWithGemini, evaluateTextWithGemini } from '../../utils/gemini';
+import { pickRandomWord } from '../../utils/common';
 
-const VoiceInput = () => {
+import Button from '@mui/material/Button';
+import MicIcon from '@mui/icons-material/Mic'; // 追加
+import StopIcon from '@mui/icons-material/Stop'; // 停止用アイコンも追加
+import ReactMarkdown from 'react-markdown';
+
+type VoiceInputProps = {
+  answerWordList: string[];
+  selectedDeviceId: string | null;
+  endVerbalization: () => void;
+};
+
+const VoiceInput = ({ answerWordList, selectedDeviceId, endVerbalization }: VoiceInputProps) => {
   const [isRecording, setIsRecording] = useState(false); // 録音中かどうかの状態
   const [audioURL, setAudioURL] = useState<string | null>(null); // 録音した音声のURL
-  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]); // 利用可能なデバイスリスト
-  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null); // 選択されたデバイスID
+  //const [devices, setDevices] = useState<MediaDeviceInfo[]>([]); // 利用可能なデバイスリスト
+  //const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null); // 選択されたデバイスID
   const mediaRecorderRef = useRef<MediaRecorder | null>(null); // MediaRecorderの参照
 
-  const [spokenText, setSpokenText] = useState('認識テキスト');// 音声認識したテキストを格納するためのuseState
+  const [spokenText, setSpokenText] = useState('');// 音声認識したテキストを格納するためのuseState
 
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null); // 追加: 録音したBlobを保存するstate
+  const [evaluationText, setEvalutionText] = useState(''); // 言語化した内容に対する評価を格納するためのuseState
 
-  // 利用可能なデバイスを取得
-  //コンポーネントが初めてレンダリングされたときにのみ実行されるようにuseEffectの第二引数に空の配列を渡している
-  useEffect(() => {
-    const fetchDevices = async () => {
-      try {
-        // マイクの許可を取得
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null); // 録音したBlobを保存するstate
 
-        // ユーザーのマイクデバイス一覧を取得
-        const deviceList = await navigator.mediaDevices.enumerateDevices();
-        const audioInputDevices = deviceList.filter(device => device.kind === 'audioinput');
-        setDevices(audioInputDevices);
+  const [targetWord, setTagetWord] = useState(''); // 言語化の対象となる用語を格納するためのuseState
 
-        if (audioInputDevices.length > 0) {
-          setSelectedDeviceId(audioInputDevices[0].deviceId); // デフォルトで最初のデバイスを選択
-        }
-      } catch (error) {
-        console.error('マイクの許可が得られませんでした:', error);
-      }
-    };
+  const [isLoading, setIsLoading] = useState(false); // クイズ生成中のローディング状態を管理するuseState
 
-    fetchDevices();
-  }, []);
+  
 
   // 録音開始ボタンがクリックされたときの処理 Blobオブジェクトを作成して音声データを保存する
   const handleStartRecording = async () => {
@@ -78,74 +74,113 @@ const VoiceInput = () => {
   // 録音した音声データをGeminiAPIに文字起こししてもらう
   const sendAudioToGeminiAPI = async () => {
     if (!audioBlob) return; // 録音した音声データが存在する場合のみ実行
-    const text = await startGeminiVoice(audioBlob);
+    const text = await transcribeAudioWithGemini(audioBlob);
     setSpokenText(text); // 文字起こし結果をstateに保存
+    const evaluation = await evaluateTextWithGemini(text, targetWord);
+    setEvalutionText(evaluation); // 一致度評価をstateに保存
   
-};
+}; 
+
+
+  //言語化問題を一問生成しステートに保存する関数
+  const generateVerbalizationQuestion = () => {
+    const word = pickRandomWord(answerWordList); // 候補からランダムに選ばれた用語を取得
+    setTagetWord(word); // 言語化の対象となる用語をstateにセット
+    setSpokenText(''); // 前の問題の文字起こし結果をクリア
+    setAudioURL(null); // 前の問題の音声URLをクリア
+    setAudioBlob(null); // 前の問題の音声Blobをクリア
+    setEvalutionText(''); // 前の問題の評価をクリア
+  };
+
+  //クイズスタート時に一問目を生成するためのuseEffect
+  useEffect(() => {
+  if (answerWordList.length > 0) {
+    generateVerbalizationQuestion();
+  }
+  }, [answerWordList]);
 
   return (
     <div className="text-center">
-      <h2 className="text-xl font-bold mb-4">指定の用語について音声で説明してください:</h2>
-      <h2 className="text-xl font-bold mb-4">MACアドレス</h2>
-
-      {/* マイク選択ドロップダウン */}
-      <div className="mb-4">
-        <label htmlFor="device-select" className="block mb-2 font-bold">
-          使用するマイクを選択:
-        </label>
-        <select
-          id="device-select"
-          value={selectedDeviceId || ''}
-          onChange={(e) => setSelectedDeviceId(e.target.value)}
-          className="border px-2 py-1 rounded"
-        >
-          {devices.map((device) => (
-            <option key={device.deviceId} value={device.deviceId}>
-              {device.label || `マイク ${device.deviceId}`}
-            </option>
-          ))}
-        </select>
-      </div>
+      <h2 className="text-xl font-bold mb-4">{targetWord} について音声で説明してください</h2>
 
       {/* 録音ボタン */}
       {isRecording ? (
-        <button
+        <Button
           onClick={handleStopRecording}
-          className="bg-red-500 text-white px-4 py-2 rounded"
+          variant="contained"
+          color="error"
+          style={{ minWidth: 56, minHeight: 56, borderRadius: "50%" }}
         >
-          録音停止
-        </button>
+          <StopIcon fontSize="large" />
+        </Button>
       ) : (
-        <button
+        <Button
           onClick={handleStartRecording}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          variant="contained"
+          color="primary"
+          style={{ minWidth: 56, minHeight: 56, borderRadius: "50%" }}
         >
-          録音開始
-        </button>
+          <MicIcon fontSize="large" />
+        </Button>
       )}
 
-      {/* 録音した音声の再生とダウンロード */}
-      {audioURL && (
-        <div className="mt-4">
-          <h3 className="text-lg font-bold">録音した音声:</h3>
-          <audio controls src={audioURL}></audio>
-          <a
-            href={audioURL}
-            download="recording.webm"
-            className="block mt-2 text-blue-500 underline"
+      {/* 録音した音声の再生*/}
+        {/* {audioURL && audioURL &&(
+          <div className="mt-4">
+            <audio controls src={audioURL}></audio>
+          </div>
+        )} */}
+      {/* 録音した音声の文字起こし開始 */}
+      {audioBlob && (
+        <div style={{ marginTop: 16 }}>
+          <button
+            onClick={sendAudioToGeminiAPI}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
           >
-            音声をダウンロード
-          </a>
+            判定
+          </button>
+        </div>)}
+
+      {/* 音声認識結果の表示 */}
+      {spokenText && (
+        <div
+          style={{
+            border: "2px solid #1976d2",
+            borderRadius: "8px",
+            padding: "16px",
+            margin: "24px auto",
+            maxWidth: "500px",
+            background: "#f5faff",
+            color: "#222",
+            wordBreak: "break-all"
+          }}
+        >
+          <div>{spokenText}</div>
         </div>
       )}
-      {/* 録音した音声の文字起こし開始 */}
-      {audioBlob && (<button
-          onClick={sendAudioToGeminiAPI}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+      <ReactMarkdown>{evaluationText}</ReactMarkdown>
+
+      {/* 次の問題へボタン */}
+      <div style={{ width: "100%", display: "flex", justifyContent: "center", gap: 16, marginTop: 24 }}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={endVerbalization}
+          style={{ minWidth: 120, fontWeight: "bold" }}
+          disabled={isLoading}
         >
-          文字起こし開始
-        </button>)}
-      <h2 className="text-xl font-bold mb-4">{spokenText}</h2>
+          言語化モードを終了
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={generateVerbalizationQuestion}
+          style={{ minWidth: 200, fontWeight: "bold", fontSize: "1.1em" }}
+          disabled={isLoading}
+        >
+          次の問題へ
+        </Button>
+      </div>
     </div>
   );
 };

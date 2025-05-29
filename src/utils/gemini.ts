@@ -37,7 +37,7 @@ const checkAnswerWithGemini = async (question: string, answer: string): Promise<
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   // クイズの問題文と解答をモデルに渡して判定を行う
-  const prompt = `次のクイズの問題文に対する回答が正しいかどうかを判定してください。\n
+  const prompt = `次のクイズの問題文に対する回答が正しいかどうかを判定してください。
     問題文: ${question}\n
     解答: ${answer}\n
     正しい場合は「正解」、間違っている場合は「不正解」とだけ出力してください。`;
@@ -54,8 +54,10 @@ const checkAnswerWithGemini = async (question: string, answer: string): Promise<
   return text;
 }
 
-// Geminiモデルを使用して音声認識を行うための関数
-const startGeminiVoice = async (audioBlob: Blob): Promise<string> => {
+
+// 1. 音声→テキスト
+const transcribeAudioWithGemini = async (audioBlob: Blob): Promise<string> => {
+  // ...音声データをGeminiに送り、文字起こしだけを返す...
   // 音声データをGemini APIに送信してテキストを取得する処理を実装 
   // gemini-2.0-flash モデルを使用
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
@@ -72,7 +74,7 @@ const startGeminiVoice = async (audioBlob: Blob): Promise<string> => {
 
 
   const contents = [
-  { text: "この音声を日本語で文字起こししてください。" },
+  { text: `この音声を日本語で文字起こしし、その内容を出力してください。` },
   {
     inlineData: {
       mimeType: "audio/webm", // 録音形式に合わせて変更
@@ -87,7 +89,28 @@ const startGeminiVoice = async (audioBlob: Blob): Promise<string> => {
   return text;
 }
 
+// 2. テキスト→一致度判定
+const evaluateTextWithGemini = async (transcribedText: string, targetWord: string): Promise<string> => {
+  // ...transcribedTextとtargetWordをGeminiに送り、一致度判定...
+  // gemini-2.0-flash モデルを使用
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+  // 言語化した内容とターゲットの用語の概要がどれくらい一致しているかを評価するプロンプトを作成
+  const prompt = `${targetWord}の概要について、次に与えるテキストとどれくらい一致しているかを100点満点で評価し、点数と簡単な理由を教えてください。\n
+    テキスト: ${transcribedText}\n`;
+
+  // プロンプトに基づいてテキストを生成
+  const result = await model.generateContent(prompt);
+
+  // 生成されたテキストを取得
+  const response = await result.response;
+
+  // テキストを抽出
+  const text = response.text();
+
+  return text;
+}
 
 
 // エクスポートをまとめて行う
-export { startGeminiVoice, generateQuizWithGemini, checkAnswerWithGemini };
+export {  generateQuizWithGemini, checkAnswerWithGemini, transcribeAudioWithGemini, evaluateTextWithGemini };

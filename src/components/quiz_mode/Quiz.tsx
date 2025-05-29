@@ -2,10 +2,14 @@ import { useState, useEffect } from 'react';
 import { getDocs, collection } from "firebase/firestore";
 import { db } from "../../utils/firebase"; // Firestoreインスタンス
 import QuizGenerator from './QuizGenerator';
+import Button from '@mui/material/Button';
 
+type QuizProps = {
+  answerWordList: string[];
+};
 
-const Quiz = () => {
-    const [answerWordList, setAnswerWordList] = useState<string[]>([]); // クイズの解答となる用語の候補リスト
+const Quiz = ({answerWordList}: QuizProps) => {
+    //const [answerWordList, setAnswerWordList] = useState<string[]>([]); // クイズの解答となる用語の候補リスト
 
 
     //用語クイズが開始されているかどうかを管理するuseState
@@ -23,21 +27,21 @@ const Quiz = () => {
       // 結果の保存や状態リセットなど
     };
 
-    // データベース（Firestore）から用語を取得して配列化する関数
-    const fetchTerms = async (): Promise<void> => {
-      const querySnapshot = await getDocs(collection(db, "itTerms"));
-      console.log(1111111111);
-      const terms = querySnapshot.docs
-        .map(doc => doc.data().term)
-        .filter((term): term is string => !!term);
-      setAnswerWordList(terms);
-      console.log("用語リスト:", terms);
-    };
+    // // データベース（Firestore）から用語を取得して配列化する関数
+    // const fetchTerms = async (): Promise<void> => {
+    //   const querySnapshot = await getDocs(collection(db, "itTerms"));
+    //   console.log(1111111111);
+    //   const terms = querySnapshot.docs
+    //     .map(doc => doc.data().term)
+    //     .filter((term): term is string => !!term);
+    //   setAnswerWordList(terms);
+    //   console.log("用語リスト:", terms);
+    // };
 
-    // 初回マウント時のみfetchTermsを実行
-    useEffect(() => {
-      fetchTerms();
-    }, []);
+    // // 初回マウント時のみfetchTermsを実行
+    // useEffect(() => {
+    //   fetchTerms();
+    // }, []);
 
 
   return (
@@ -46,15 +50,21 @@ const Quiz = () => {
         <div>
           {/* クイズモード開始前の画面内容 */}
           <p>このモードでは、応用情報技術者試験に出現するIT用語に関するクイズが生成AIによって出題されます。</p>
-          <button onClick={startQuiz}>クイズを開始</button>
+          <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 32 }}>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={startQuiz}
+              style={{ minWidth: 160, fontWeight: "bold" }}
+            >
+              クイズを開始
+            </Button>
+          </div>
         </div>
       ) : (
         <div>
           {/* クイズモードの画面内容をここに記述 */}
-          <QuizGenerator answerWordList={answerWordList}></QuizGenerator>
-          <div style={{ marginTop: "32px", textAlign: "center" }}>
-            <button onClick={endQuiz}>クイズを終了</button>
-          </div>
+          <QuizGenerator answerWordList={answerWordList} endQuiz={endQuiz}></QuizGenerator>
           {/* 他のクイズ用UIもここに追加 */}
         </div>
       )}
