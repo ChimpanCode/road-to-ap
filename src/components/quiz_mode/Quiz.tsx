@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react';
-import { getDocs, collection } from "firebase/firestore";
-import { db } from "../../utils/firebase"; // Firestoreインスタンス
+import { useState } from 'react';
 import QuizGenerator from './QuizGenerator';
 import Button from '@mui/material/Button';
 

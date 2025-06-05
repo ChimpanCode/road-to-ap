@@ -6,7 +6,7 @@
 // そのアカウントでログインしているユーザーの学習記録を表示する？
 // 勉強時間を記録したい（自分で入力）
 
-import { useState } from 'react';
+//import { useState } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 const sample_data = [
