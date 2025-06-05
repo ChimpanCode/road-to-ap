@@ -1,6 +1,7 @@
 // date-fnsを利用して応用情報技術者試験日までの残り日数を表示するコンポーネント
 import { differenceInDays } from 'date-fns'; // 日付の差分を計算する関数をインポート
-import { TARGET_DATE } from '../constants/constants'; // 試験日を定義した定数をインポート
+//import { TARGET_DATE } from '../constants/constants'; // 試験日を定義した定数をインポート
+import { TARGET_DATE } from '../../constants/constants';
 
 const DaysLeft = () => {
   const today = new Date(); // 現在の日付を取得

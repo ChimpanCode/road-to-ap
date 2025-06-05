@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
-import VoiceInput from './VoiceInput'
+
 import Button from '@mui/material/Button';
+
+import MicSelector from './MicSelector';
+import VerbalizationGenerator from './VerbalizationGenerator'
 
 
 type VerbalizationProps = {
@@ -64,23 +67,11 @@ const Verbalization = ({answerWordList}: VerbalizationProps) => {
           <p>このモードでは、IT用語を自分の音声で説明し、どれくらい説明できているかをAIが判定します</p>
 
           {/* マイク選択ドロップダウン */}
-          <div className="mb-4">
-            <label htmlFor="device-select" className="block mb-2 font-bold">
-              使用するマイクを選択:
-            </label>
-            <select
-              id="device-select"
-              value={selectedDeviceId || ''}
-              onChange={(e) => setSelectedDeviceId(e.target.value)}
-              className="border px-2 py-1 rounded"
-            >
-              {devices.map((device) => (
-                <option key={device.deviceId} value={device.deviceId}>
-                  {device.label || `マイク ${device.deviceId}`}
-                </option>
-              ))}
-            </select>
-          </div>
+          <MicSelector
+            devices={devices}
+            selectedDeviceId={selectedDeviceId}
+            setSelectedDeviceId={setSelectedDeviceId} 
+          />
 
           {/*  言語化モード開始ボタン */}
           <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 32 }}>
@@ -98,7 +89,7 @@ const Verbalization = ({answerWordList}: VerbalizationProps) => {
       ) : (
         <div>
           {/* 言語化モードの画面内容 */}
-          <VoiceInput answerWordList={answerWordList} selectedDeviceId={selectedDeviceId} endVerbalization={endVerbalization} />
+          <VerbalizationGenerator answerWordList={answerWordList} selectedDeviceId={selectedDeviceId} endVerbalization={endVerbalization} />
         </div>
       )}
     </>
