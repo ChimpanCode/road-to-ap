@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import DaysLeft from './DaysLeft';
 import { db } from '../../utils/firebase';
-import { doc, collection, addDoc, setDoc, Timestamp, getDocs, query, orderBy } from 'firebase/firestore';
+import { doc, collection, setDoc, Timestamp, getDocs, query, orderBy } from 'firebase/firestore';
 
 //申し込み日時については、ユーザー毎ではなく、共通の予定にしたい
 

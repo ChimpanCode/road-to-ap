@@ -4,13 +4,13 @@ import { transcribeAudioWithGemini, evaluateTextWithGemini } from '../../utils/g
 import { pickRandomWord } from '../../utils/common';
 
 import Button from '@mui/material/Button';
-import MicIcon from '@mui/icons-material/Mic'; // 追加
-import StopIcon from '@mui/icons-material/Stop'; // 停止用アイコンも追加
+// import MicIcon from '@mui/icons-material/Mic'; // 追加
+// import StopIcon from '@mui/icons-material/Stop'; // 停止用アイコンも追加
 import ReactMarkdown from 'react-markdown';
 
 // コンポーネントのインポート
 import MicRecordButton from './MicRecordButton';
-import SpokenTextDisplay from './SpokenTextDisplay';
+// import SpokenTextDisplay from './SpokenTextDisplay';
 
 type VoiceInputProps = {
   answerWordList: string[];
@@ -20,7 +20,7 @@ type VoiceInputProps = {
 
 const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbalization }: VoiceInputProps) => {
   const [isRecording, setIsRecording] = useState(false); // 録音中かどうかの状態
-  const [audioURL, setAudioURL] = useState<string | null>(null); // 録音した音声のURL
+  //onst [audioURL, setAudioURL] = useState<string | null>(null); // 録音した音声のURL
   //const [devices, setDevices] = useState<MediaDeviceInfo[]>([]); // 利用可能なデバイスリスト
   //const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null); // 選択されたデバイスID
   const mediaRecorderRef = useRef<MediaRecorder | null>(null); // MediaRecorderの参照
@@ -33,7 +33,7 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
 
   const [targetWord, setTagetWord] = useState(''); // 言語化の対象となる用語を格納するためのuseState
 
-  const [isLoading, setIsLoading] = useState(false); // クイズ生成中のローディング状態を管理するuseState
+  //const [isLoading, setIsLoading] = useState(false); // クイズ生成中のローディング状態を管理するuseState
 
   
 
@@ -56,8 +56,8 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); // 音声データをBlobとして保存
         setAudioBlob(audioBlob); // stateに保存
-        const audioURL = URL.createObjectURL(audioBlob); // BlobをURLに変換
-        setAudioURL(audioURL); // URLを状態に保存
+        //const audioURL = URL.createObjectURL(audioBlob); // BlobをURLに変換
+        //setAudioURL(audioURL); // URLを状態に保存
       };
 
       mediaRecorder.start(); // 録音開始
@@ -90,7 +90,7 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
     const word = pickRandomWord(answerWordList); // 候補からランダムに選ばれた用語を取得
     setTagetWord(word); // 言語化の対象となる用語をstateにセット
     setSpokenText(''); // 前の問題の文字起こし結果をクリア
-    setAudioURL(null); // 前の問題の音声URLをクリア
+    //setAudioURL(null); // 前の問題の音声URLをクリア
     setAudioBlob(null); // 前の問題の音声Blobをクリア
     setEvalutionText(''); // 前の問題の評価をクリア
   };
@@ -158,7 +158,6 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
           color="secondary"
           onClick={endVerbalization}
           style={{ minWidth: 120, fontWeight: "bold" }}
-          disabled={isLoading}
         >
           言語化モードを終了
         </Button>
@@ -168,7 +167,6 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
           color="primary"
           onClick={generateVerbalizationQuestion}
           style={{ minWidth: 200, fontWeight: "bold", fontSize: "1.1em" }}
-          disabled={isLoading}
         >
           次の問題へ
         </Button>
