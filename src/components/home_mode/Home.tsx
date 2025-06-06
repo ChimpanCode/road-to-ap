@@ -7,6 +7,9 @@ import { db } from '../../utils/firebase';
 import { doc, collection, setDoc, Timestamp, getDocs, query, orderBy, deleteDoc } from 'firebase/firestore';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Fab, Tooltip, Snackbar, Paper, IconButton } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 //申し込み日時については、ユーザー毎ではなく、共通の予定にしたい
 
 const Home = () => {
@@ -15,7 +18,7 @@ const Home = () => {
   const [schedules, setSchedules] = useState<
     { id: string; title: string; date: string; createdAt: any }[]
   >([]);
-
+  const [showForm, setShowForm] = useState(false); // フォーム表示状態
 
    // 予定をデータベースに保存
   const handleAddEvent = async (e: React.FormEvent) => {
@@ -34,6 +37,7 @@ const Home = () => {
       });
       setEventTitle('');
       setEventDate('');
+      setShowForm(false); // 追加後フォームを閉じる
       await fetchSchedules(); // 追加後に最新の予定一覧を取得して反映
     } catch (error) {
       alert('追加に失敗しました');
@@ -68,14 +72,46 @@ const Home = () => {
   return (
     <>
       <ToastContainer />
-      <DaysLeft></DaysLeft>
-      <ScheduleForm
-        eventTitle={eventTitle}
-        setEventTitle={setEventTitle}
-        eventDate={eventDate}
-        setEventDate={setEventDate}
-        handleAddEvent={handleAddEvent}
-      />
+      <DaysLeft/>
+      {/* プラスボタンでフォーム表示 */}
+      <div className="flex justify-center mt-8" style={{ minHeight: 56 }}>
+        {!showForm ? (
+          <Tooltip title="予定を追加">
+            <Fab color="primary" onClick={() => setShowForm(true)}>
+              <AddIcon />
+            </Fab>
+          </Tooltip>
+        ) : (
+          // フォーム表示中は空のdivで高さを維持
+          <div style={{ width: 40, height: 40 }} />
+        )}
+      </div>
+      {/* トースト風フォーム */}
+      <Snackbar
+        open={showForm}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClose={() => setShowForm(false)}
+        autoHideDuration={null} // 自動で閉じない
+        sx={{ zIndex: 1301 }} // モーダルより上に
+      >
+        <Paper sx={{ p: 2, minWidth: 320, boxShadow: 4, borderRadius: 3, position: 'relative' }}>
+          <IconButton
+            size="small"
+            onClick={() => setShowForm(false)}
+            sx={{ position: 'absolute', top: 8, right: 8 }}
+            aria-label="閉じる"
+          >
+            <CloseIcon />
+          </IconButton>
+          <ScheduleForm
+            eventTitle={eventTitle}
+            setEventTitle={setEventTitle}
+            eventDate={eventDate}
+            setEventDate={setEventDate}
+            handleAddEvent={handleAddEvent}
+          />
+        </Paper>
+      </Snackbar>
       <ScheduleList schedules={schedules} handleDelete={handleDelete} />
     </>
   );

@@ -14,10 +14,10 @@ type Props = {
   handleDelete: (id: string) => void; // 削除ボタン押下時の処理
 };
 
-// 予定一覧を表示するコンポーネント
-const ScheduleList: React.FC<Props> = ({ schedules, handleDelete }) => (
+// 予定一覧を表示するモダンな関数コンポーネント
+const ScheduleList = ({ schedules, handleDelete }: Props) => (
   <div className="mt-8 w-full flex flex-col items-center">
-    <ul className="w-80 flex flex-col gap-4">
+    <ul className="w-80 flex flex-col gap-4 max-h-120 overflow-y-auto">
       {/* 予定がない場合の表示 */}
       {schedules.length === 0 && (
         <li className="text-gray-500">まだ予定がありません</li>
