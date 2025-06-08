@@ -47,8 +47,10 @@ const Quiz = ({answerWordList}: QuizProps) => {
       {!isQuizStarted ? (
         <div>
           {/* クイズモード開始前の画面内容 */}
-          <p>このモードでは、応用情報技術者試験に出現するIT用語に関するクイズが生成AIによって出題されます。</p>
-          <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 32 }}>
+          <p className="max-w-xl mx-auto mt-8 mb-6 bg-blue-50 rounded-xl px-6 py-5 text-center text-base text-gray-800 font-medium shadow">
+            このモードでは、応用情報技術者試験に出現するIT用語に関するクイズが生成AIによって出題されます。
+          </p>
+          <div className="flex justify-center gap-4 mt-8">
             <Button
               variant="contained"
               color="secondary"

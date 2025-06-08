@@ -2,21 +2,19 @@ type Props = {
   spokenText: string;
 };
 
-const SpokenTextDisplay = ({ spokenText }: Props) => (
-  <div
-    style={{
-      border: "2px solid #1976d2",
-      borderRadius: "8px",
-      padding: "16px",
-      margin: "24px auto",
-      maxWidth: "500px",
-      background: "#f5faff",
-      color: "#222",
-      wordBreak: "break-all"
-    }}
-  >
-    <div>{spokenText}</div>
-  </div>
-);
+const SpokenTextDisplay = ({ spokenText }: Props) => {
+  return (
+    <div>
+    {/* 音声認識結果の表示 */}
+      {spokenText && (
+        <div
+          className="class=border-2 border-[#1976d2] rounded-lg p-4 mx-auto max-w-lg bg-[#f5faff] text-[#222] break-all"
+        >
+          <div>{spokenText}</div>
+        </div>
+      )}
+    </div>
+  )
+}
 
-export default SpokenTextDisplay;
+export default SpokenTextDisplay

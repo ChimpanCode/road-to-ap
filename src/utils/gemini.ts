@@ -55,11 +55,9 @@ const checkAnswerWithGemini = async (question: string, answer: string): Promise<
 }
 
 
-// 1. 音声→テキスト
+// 音声データをGeminiに送り、文字起こししたテキストを返す関数
 const transcribeAudioWithGemini = async (audioBlob: Blob): Promise<string> => {
-  // ...音声データをGeminiに送り、文字起こしだけを返す...
-  // 音声データをGemini APIに送信してテキストを取得する処理を実装 
-  // gemini-2.0-flash モデルを使用
+  // 音声データをGemini APIに送信し
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   // BlobをArrayBufferに変換
@@ -74,14 +72,14 @@ const transcribeAudioWithGemini = async (audioBlob: Blob): Promise<string> => {
 
 
   const contents = [
-  { text: `この音声を日本語で文字起こしし、その内容を出力してください。` },
-  {
-    inlineData: {
-      mimeType: "audio/webm", // 録音形式に合わせて変更
-      data: base64Audio,
+    { text: `この音声を日本語で文字起こしし、文字起こしした内容のみを出力してください。` },
+    {
+      inlineData: {
+        mimeType: "audio/webm", // 録音形式に合わせて変更
+        data: base64Audio,
+      },
     },
-  },
-];
+  ];
 // generateContentに配列を直接渡す
   const result = await model.generateContent(contents);
   const response = await result.response;
@@ -89,15 +87,18 @@ const transcribeAudioWithGemini = async (audioBlob: Blob): Promise<string> => {
   return text;
 }
 
-// 2. テキスト→一致度判定
+// transcribedTextとtargetWordをGeminiに送り、一致度判定を行う関数
 const evaluateTextWithGemini = async (transcribedText: string, targetWord: string): Promise<string> => {
-  // ...transcribedTextとtargetWordをGeminiに送り、一致度判定...
-  // gemini-2.0-flash モデルを使用
+  // geminiのモデルを指定
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   // 言語化した内容とターゲットの用語の概要がどれくらい一致しているかを評価するプロンプトを作成
-  const prompt = `${targetWord}の概要について、次に与えるテキストとどれくらい一致しているかを100点満点で評価し、点数と簡単な理由を教えてください。\n
-    テキスト: ${transcribedText}\n`;
+  const prompt = `
+  ${targetWord}の概要について、最後に与える「」で囲まれたテキストとどれくらい一致しているかを
+  100点満点で評価し、点数と簡単な評価理由を教えてください。
+  出力するテキストは、(点数)(評価理由)のようにそれぞれを（）で囲んでください。\n
+    テキスト: 「${transcribedText}」\n
+    `;
 
   // プロンプトに基づいてテキストを生成
   const result = await model.generateContent(prompt);
@@ -107,6 +108,8 @@ const evaluateTextWithGemini = async (transcribedText: string, targetWord: strin
 
   // テキストを抽出
   const text = response.text();
+
+  
 
   return text;
 }

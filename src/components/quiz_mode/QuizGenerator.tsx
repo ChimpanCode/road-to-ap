@@ -75,8 +75,9 @@ const QuizGenerator = ({ answerWordList, endQuiz }: Props) => {
   }, [questionText, isLoading]); // 問題が変わるたびにフォーカス
 
   return (
-    <main className="w-full h-screen flex flex-col justify-center items-center bg-sky-100">
-      <h3 className="text-gray-700 text-5xl font-bold"></h3>
+    <div className="w-full flex flex-col justify-center items-center">
+      
+      <h3 className="text-gray-700 text-5xl font-bold mb-4"></h3>
 
       {/* 問題文の表示 クイズを生成中かどうかで表示を切り替える */}
       <QuestionDisplay questionText={questionText} isLoading={isLoading} />
@@ -96,7 +97,7 @@ const QuizGenerator = ({ answerWordList, endQuiz }: Props) => {
         generateQuiz={generateQuiz}
         endQuiz={endQuiz}
       />
-    </main>
+    </div>
   );
 };
 

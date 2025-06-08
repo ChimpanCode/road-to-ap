@@ -6,11 +6,11 @@ import MicSelector from './MicSelector';
 import VerbalizationGenerator from './VerbalizationGenerator'
 
 
-type VerbalizationProps = {
+type Props = {
   answerWordList: string[];
 };
 
-const Verbalization = ({answerWordList}: VerbalizationProps) => {
+const Verbalization = ({answerWordList}: Props) => {
   //const [answerWordList, setAnswerWordList] = useState<string[]>([]); // クイズの解答となる用語の候補リスト
   //用語クイズが開始されているかどうかを管理するuseState
   const [isVerbalizationStarted, setIsVerbalizationStarted] = useState(false); // 言語化モード開始状態を管理するuseState
@@ -64,7 +64,9 @@ const Verbalization = ({answerWordList}: VerbalizationProps) => {
       {!isVerbalizationStarted ? (
         <div>
           {/* 言語化モード開始前の画面内容 */}
-          <p>このモードでは、IT用語を自分の音声で説明し、どれくらい説明できているかをAIが判定します</p>
+          <p className="max-w-xl mx-auto mt-8 mb-6 bg-blue-50 rounded-xl px-6 py-5 text-center text-base text-gray-800 font-medium shadow">
+            このモードでは、IT用語を自分の音声で説明し、どれくらい説明できているかをAIが判定します
+          </p>
 
           {/* マイク選択ドロップダウン */}
           <MicSelector
