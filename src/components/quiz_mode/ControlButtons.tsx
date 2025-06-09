@@ -1,32 +1,40 @@
 import Button from "@mui/material/Button";
 
 type Props = {
-  endQuiz: () => void;
-  generateQuiz: () => void;
+  endAction: () => void;
+  nextAction: () => void;
   isLoading: boolean;
+  endButtonText?: string;
+  nextButtonText?: string;
 };
 
-const ControlButtons = ({ endQuiz, generateQuiz, isLoading }: Props) => (
+const ControlButtons = ({ 
+  endAction, 
+  nextAction, 
+  isLoading,
+  endButtonText = "終了",
+  nextButtonText = "次の問題へ"
+}: Props) => (
   <div style={{ width: "100%", display: "flex", justifyContent: "center", gap: 16, marginTop: 24 }}>
-    {/* クイズを終了するボタン */}
+    {/* 終了ボタン */}
     <Button
       variant="outlined"
       color="secondary"
-      onClick={endQuiz}
+      onClick={endAction}
       style={{ minWidth: 120, fontWeight: "bold" }}
       disabled={isLoading}
     >
-      クイズを終了
+      {endButtonText}
     </Button>
     {/* 次の問題へボタン */}
     <Button
       variant="contained"
       color="primary"
-      onClick={generateQuiz}
+      onClick={nextAction}
       style={{ minWidth: 200, fontWeight: "bold", fontSize: "1.1em" }}
       disabled={isLoading}
     >
-      次の問題へ
+      {nextButtonText}
     </Button>
   </div>
 );

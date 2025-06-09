@@ -3,13 +3,13 @@ import { useState, useRef, useEffect } from 'react';
 import { transcribeAudioWithGemini, evaluateTextWithGemini } from '../../utils/gemini';
 import { pickRandomWord } from '../../utils/common';
 
-import Button from '@mui/material/Button';
-
-
+import Box from '@mui/material/Box';
 // コンポーネントのインポート
 import MicRecordButton from './MicRecordButton';
+import EvaluationButton from './EvaluationButton';
 import SpokenTextDisplay from './SpokenTextDisplay';
 import EvaluationTextDisplay from './EvaluationTextDisplay';
+import ControlButtons from '../quiz_mode/ControlButtons';
 
 type VoiceInputProps = {
   answerWordList: string[];
@@ -32,7 +32,7 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
 
   const [targetWord, setTagetWord] = useState(''); // 言語化の対象となる用語を格納するためのuseState
 
-  //const [isLoading, setIsLoading] = useState(false); // クイズ生成中のローディング状態を管理するuseState
+  const [isLoading, setIsLoading] = useState(false); // クイズ生成中のローディング状態を管理するuseState
 
   
 
@@ -52,11 +52,12 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
         audioChunks.push(event.data); // 音声データを収集
       };
 
-      mediaRecorder.onstop = () => {
+      mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); // 音声データをBlobとして保存
         setAudioBlob(audioBlob); // stateに保存
-        //const audioURL = URL.createObjectURL(audioBlob); // BlobをURLに変換
-        //setAudioURL(audioURL); // URLを状態に保存
+        // 録音が停止されたら音声データをGeminiAPIに送信して文字起こしのみ実行
+        const text = await transcribeAudioWithGemini(audioBlob);
+        setSpokenText(text);
       };
 
       mediaRecorder.start(); // 録音開始
@@ -67,24 +68,26 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
   };
 
   // 録音停止ボタンがクリックされたときの処理
-  const handleStopRecording = async () => {
+  const handleStopRecording = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop(); // 録音停止
       setIsRecording(false);
-      // // 録音が停止されたら音声データをGeminiAPIに送信
-      // if (!audioBlob) return; // 録音した音声データが存在する場合のみ実行
-      // const text = await transcribeAudioWithGemini(audioBlob);
-      // setSpokenText(text); 
     }
   };
 
   // 録音した音声データをGeminiAPIに文字起こししてもらい、評価を受ける関数
   const sendAudioToGeminiAPI = async () => {
-    if (!audioBlob) return; // 録音した音声データが存在する場合のみ実行
-    const text = await transcribeAudioWithGemini(audioBlob);
-    setSpokenText(text); // 文字起こし結果をstateに保存
-    const evaluation = await evaluateTextWithGemini(text, targetWord);
-    setEvalutionText(evaluation); // 一致度評価をstateに保存
+    if (!spokenText) return;
+    
+    setIsLoading(true);
+    try {
+      const evaluation = await evaluateTextWithGemini(spokenText, targetWord);
+      setEvalutionText(evaluation);
+    } catch (error) {
+      console.error('評価中にエラーが発生しました:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }; 
 
   //録音した音声データをGeminiAPIに文字起こししてもらう関数
@@ -116,7 +119,6 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
       >
         <h2 className="text-xl font-bold mb-4">{targetWord} について音声で説明してください</h2>
       </div>
-      
 
       {/* 録音ボタン */}
       <MicRecordButton 
@@ -125,44 +127,63 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
         onStopRecording={handleStopRecording}
       />
 
-      {/* 録音した音声の文字起こし開始 */}
-      {audioBlob && (
-        <div className="mt-4 text-center">
-          <button
-            onClick={sendAudioToGeminiAPI}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
-          >
-            判定する
-          </button>
-        </div>)}
-
-      {/* 音声認識結果の表示 */}
-      <SpokenTextDisplay spokenText={spokenText} />
-
-      {/* 評価文の表示 */}
-      <EvaluationTextDisplay evaluationText={evaluationText} />
-
-      
-      <div style={{ width: "100%", display: "flex", justifyContent: "center", gap: 16, marginTop: 24 }}>
-        {/* モード終了ボタン */}
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={endVerbalization}
-          style={{ minWidth: 120, fontWeight: "bold" }}
+      {/* 3カラムレイアウト */}
+      <Box
+        sx={{
+          display: 'flex',
+          width: '100%',
+          maxWidth: 1200,
+          mt: 4,
+          gap: 4,
+          px: 2,
+          alignItems: 'center',
+        }}
+      >
+        {/* 左カラム：音声認識結果 */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+          }}
         >
-          言語化モードを終了
-        </Button>
-        {/* 次の問題へボタン */}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={generateVerbalizationQuestion}
-          style={{ minWidth: 200, fontWeight: "bold", fontSize: "1.1em" }}
+          <SpokenTextDisplay spokenText={spokenText} />
+        </Box>
+
+        {/* 中央カラム：評価ボタン */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minWidth: 200,
+          }}
         >
-          次の問題へ
-        </Button>
-      </div>
+          <EvaluationButton
+            onEvaluate={sendAudioToGeminiAPI}
+            disabled={!spokenText}
+          />
+        </Box>
+
+        {/* 右カラム：評価結果 */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          <EvaluationTextDisplay evaluationText={evaluationText} />
+        </Box>
+      </Box>
+
+      {/* ボタンコンポーネント */}
+      <ControlButtons
+        endAction={endVerbalization}
+        nextAction={generateVerbalizationQuestion}
+        isLoading={isLoading}
+        endButtonText="言語化モードを終了"
+        nextButtonText="次の問題へ"
+      />
     </div>
   );
 };

@@ -94,8 +94,10 @@ const QuizGenerator = ({ answerWordList, endQuiz }: Props) => {
       {/* 次の問題へボタンとクイズ終了ボタン */}
       <ControlButtons
         isLoading={isLoading}
-        generateQuiz={generateQuiz}
-        endQuiz={endQuiz}
+        endAction={endQuiz}
+        nextAction={generateQuiz}
+        endButtonText="クイズを終了"
+        nextButtonText="次の問題へ"
       />
     </div>
   );
