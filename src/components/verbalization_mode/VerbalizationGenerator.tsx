@@ -9,7 +9,7 @@ import MicRecordButton from './MicRecordButton';
 import EvaluationButton from './EvaluationButton';
 import SpokenTextDisplay from './SpokenTextDisplay';
 import EvaluationTextDisplay from './EvaluationTextDisplay';
-import ControlButtons from '../quiz_mode/ControlButtons';
+import ControlButtons from '../common/ControlButtons';
 
 type VoiceInputProps = {
   answerWordList: string[];
@@ -28,7 +28,7 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
 
   const [evaluationText, setEvalutionText] = useState(''); // 言語化した内容に対する評価を格納するためのuseState
 
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null); // 録音したBlobを保存するstate
+  //const [audioBlob, setAudioBlob] = useState<Blob | null>(null); // 録音したBlobを保存するstate
 
   const [targetWord, setTagetWord] = useState(''); // 言語化の対象となる用語を格納するためのuseState
 
@@ -54,7 +54,7 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
 
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); // 音声データをBlobとして保存
-        setAudioBlob(audioBlob); // stateに保存
+        //setAudioBlob(audioBlob); // stateに保存
         // 録音が停止されたら音声データをGeminiAPIに送信して文字起こしのみ実行
         const text = await transcribeAudioWithGemini(audioBlob);
         setSpokenText(text);
@@ -99,7 +99,7 @@ const VerbalizationGenerator = ({ answerWordList, selectedDeviceId, endVerbaliza
     setTagetWord(word); // 言語化の対象となる用語をstateにセット
     setSpokenText(''); // 前の問題の文字起こし結果をクリア
     //setAudioURL(null); // 前の問題の音声URLをクリア
-    setAudioBlob(null); // 前の問題の音声Blobをクリア
+    //setAudioBlob(null); // 前の問題の音声Blobをクリア
     setEvalutionText(''); // 前の問題の評価をクリア
   };
 

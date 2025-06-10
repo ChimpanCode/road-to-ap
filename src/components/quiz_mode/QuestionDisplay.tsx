@@ -1,3 +1,12 @@
+/**
+ * クイズの問題文を表示するコンポーネント
+ * 
+ * @component
+ * @param {Object} props - コンポーネントのプロパティ
+ * @param {string} props.questionText - 表示する問題文（Markdown形式）
+ * @param {boolean} props.isLoading - 問題文の生成中かどうかを示すフラグ
+ * @returns {JSX.Element} 問題文を表示するコンポーネント
+ */
 import ReactMarkdown from "react-markdown";
 
 type Props = {
@@ -6,17 +15,16 @@ type Props = {
 };
 
 const QuestionDisplay = ({ questionText, isLoading }: Props) => (
-  <div
-    className="flex justify-center items-center font-bold text-3xl w-3/4 h-1/3 mt-20 bg-white rounded-lg shadow-lg p-4"
-    style={{
-      border: "2px solid #1976d2",
-      borderRadius: "12px",
-      background: "#f5faff",
-      minHeight: "120px",
-      marginBottom: "16px",
-    }}
-  >
-    {isLoading ? <p>生成中...</p> : <ReactMarkdown>{questionText}</ReactMarkdown>}
+  // 問題文のコンテナ
+  // 生成中状態と問題文表示状態で異なる内容を表示
+  <div className="flex justify-center items-center w-3/4 mt-20 bg-[#f5faff] rounded-xl p-4 min-h-[120px] mb-4 border-2 border-[#1976d2] shadow-lg">
+    {isLoading ? (
+      <p className="text-lg">生成中...</p>
+    ) : (
+      <div className="text-lg">
+        <ReactMarkdown>{questionText}</ReactMarkdown>
+      </div>
+    )}
   </div>
 );
 

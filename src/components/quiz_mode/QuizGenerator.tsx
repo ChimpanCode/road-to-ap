@@ -6,7 +6,7 @@ import { pickRandomWord } from '../../utils/common';
 // コンポーネントのインポート
 import QuestionDisplay from './QuestionDisplay';
 import AnswerForm from './AnswerForm';
-import ControlButtons from './ControlButtons';
+import ControlButtons from '../common/ControlButtons';
 
 type Props = {
   answerWordList: string[];

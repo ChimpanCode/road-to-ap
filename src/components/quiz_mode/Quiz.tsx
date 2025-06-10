@@ -25,22 +25,6 @@ const Quiz = ({answerWordList}: QuizProps) => {
       // 結果の保存や状態リセットなど
     };
 
-    // // データベース（Firestore）から用語を取得して配列化する関数
-    // const fetchTerms = async (): Promise<void> => {
-    //   const querySnapshot = await getDocs(collection(db, "itTerms"));
-    //   console.log(1111111111);
-    //   const terms = querySnapshot.docs
-    //     .map(doc => doc.data().term)
-    //     .filter((term): term is string => !!term);
-    //   setAnswerWordList(terms);
-    //   console.log("用語リスト:", terms);
-    // };
-
-    // // 初回マウント時のみfetchTermsを実行
-    // useEffect(() => {
-    //   fetchTerms();
-    // }, []);
-
 
   return (
     <>
